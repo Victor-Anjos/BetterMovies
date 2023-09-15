@@ -11,22 +11,25 @@ import {
 const History = () => {
   const [movies, setMovies] = useState([
     {
-      id: "1",
-      title: "Matrix",
-      year: "1999",
-      description: "Um filme de ficção científica.",
+      title: "A Odisseia Espacial",
+      description:
+        "Uma equipe de astronautas é enviada em uma missão para explorar os confins do espaço e descobrir segredos cósmicos.",
+      releaseDate: "10 de Setembro de 2023",
+      duration: "2h 30min",
     },
     {
-      id: "2",
-      title: "Inception",
-      year: "2010",
-      description: "Um filme de suspense e ação.",
+      title: "A Busca Pelo Tesouro Perdido",
+      description:
+        "Um grupo de aventureiros parte em uma jornada épica para encontrar um tesouro lendário escondido em uma ilha remota.",
+      releaseDate: "12 de Setembro de 2023",
+      duration: "2h 10min",
     },
     {
-      id: "3",
-      title: "Interstellar",
-      year: "2014",
-      description: "Um épico de ficção científica.",
+      title: "Amor à Primeira Vista",
+      description:
+        "Dois estranhos se encontram por acaso em uma cidade estrangeira e experimentam uma conexão instantânea.",
+      releaseDate: "15 de Setembro de 2023",
+      duration: "1h 55min",
     },
     // Adicione mais filmes aqui
   ]);
@@ -67,12 +70,9 @@ const History = () => {
             <View style={styles.movieItem}>
               <View style={styles.movieDetails}>
                 <Text style={styles.movieTitle}>{item.title}</Text>
-                <Text style={styles.movieYear}>{item.year}</Text>
-                <Text style={styles.movieDescription}>{item.description}</Text>
+                <Text style={styles.movieRelease}>{item.releaseDate}</Text>
+                <Text style={styles.movieDuration}>{item.duration}</Text>
               </View>
-              <TouchableOpacity style={styles.continueButton}>
-                <Text style={styles.continueButtonText}>Continuar</Text>
-              </TouchableOpacity>
             </View>
           )}
         />
@@ -126,15 +126,15 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "#FFFFFF",
   },
-  movieYear: {
-    fontSize: 16,
+  movieRelease: {
+    fontSize: 14,
     color: "#fff",
     marginBottom: 8,
     marginTop: 8,
   },
-  movieDescription: {
-    fontSize: 16,
-    color: "#fff",
+  movieDuration: {
+    fontSize: 15,
+    color: "#00CED1",
   },
   continueButton: {
     justifyContent: "center",

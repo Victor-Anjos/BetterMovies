@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { View, Text, TextInput, Button, StyleSheet } from "react-native";
-import Profile from "./Profile";
 
 const Login = ({ navigation }) => {
   const [username, setUsername] = useState("");
@@ -17,7 +16,7 @@ const Login = ({ navigation }) => {
     } else {
       setError("");
       if (true) {
-        navigation.replace("TabRoutes"); // Use o nome da rota correta, que é "TabRoutes" neste caso
+        navigation.replace("TabRoutes");
       } else {
         setError("Credenciais incorretas. Tente novamente.");
       }

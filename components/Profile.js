@@ -1,60 +1,21 @@
-import React, { useState, useEffect, useRef } from "react";
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  TextInput,
-  Image,
-} from "react-native";
-import { RNCamera as Camera } from "react-native-camera";
+import React, { useState } from "react";
+import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { Feather } from "@expo/vector-icons";
 
 const Profile = () => {
   const [isEditingEmail, setIsEditingEmail] = useState(false);
   const [email, setEmail] = useState("victoranjos820@gmail.com");
-  const [cameraActive, setCameraActive] = useState(false);
-  const cameraRef = useRef(null);
-
-  const takePicture = async () => {
-    if (cameraRef.current) {
-      const options = { quality: 0.5, base64: true };
-      const data = await cameraRef.current.takePictureAsync(options);
-      // Aqui você pode fazer algo com a imagem tirada, como exibi-la em algum lugar no perfil.
-      console.log(data.uri);
-      setCameraActive(false); // Fecha a câmera após tirar a foto.
-    }
-  };
 
   return (
     <View style={styles.container}>
       <View style={styles.topBar}>
         <Text style={styles.title}>Perfil</Text>
 
-        {cameraActive ? (
-          <Camera
-            ref={cameraRef}
-            style={styles.camera}
-            type={Camera.Constants.Type.back}
-            autoFocus={Camera.Constants.AutoFocus.on}
-          >
-            <TouchableOpacity
-              style={styles.captureButton}
-              onPress={takePicture}
-            >
-              <Feather name="camera" color="white" size={30} />
-            </TouchableOpacity>
-          </Camera>
-        ) : (
-          <TouchableOpacity
-            style={styles.profileImageContainer}
-            onPress={() => setCameraActive(true)}
-          >
-            <View style={styles.iconContainer}>
-              <Feather name="camera" color="white" size={30} />
-            </View>
-          </TouchableOpacity>
-        )}
+        <TouchableOpacity style={styles.profileImageContainer}>
+          <View style={styles.iconContainer}>
+            <Feather name="camera" color="white" size={30} />
+          </View>
+        </TouchableOpacity>
 
         <Text style={styles.user}>Usuario</Text>
       </View>
