@@ -17,7 +17,7 @@ export default function AuthenticatedApp() {
           height: 60,
           paddingHorizontal: 5,
           paddingTop: 0,
-          backgroundColor: "white",
+          backgroundColor: "#15214F",
           position: "absolute",
         },
       })}
@@ -33,7 +33,7 @@ export default function AuthenticatedApp() {
         }}
       />
       <Tab.Screen
-        name="Perfil"
+        name="Profile"
         component={Profile}
         options={{
           tabBarIcon: ({ size }) => (

@@ -163,9 +163,10 @@ const styles = StyleSheet.create({
   },
   noGenres: {
     color: "white",
-    fontSize: 18,
+    fontSize: 20,
     textAlign: "center",
     marginTop: 20,
+    fontWeight: "bold",
   },
   customButtonText: {
     color: "white",

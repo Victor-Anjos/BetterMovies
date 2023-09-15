@@ -11,24 +11,27 @@ import {
 const History = () => {
   const [movies, setMovies] = useState([
     {
+      id: 1,
       title: "A Odisseia Espacial",
       description:
         "Uma equipe de astronautas é enviada em uma missão para explorar os confins do espaço e descobrir segredos cósmicos.",
-      releaseDate: "10 de Setembro de 2023",
+      releaseDate: "10 de Setembro de 2010",
       duration: "2h 30min",
     },
     {
+      id: 2,
       title: "A Busca Pelo Tesouro Perdido",
       description:
         "Um grupo de aventureiros parte em uma jornada épica para encontrar um tesouro lendário escondido em uma ilha remota.",
-      releaseDate: "12 de Setembro de 2023",
+      releaseDate: "12 de Setembro de 2013",
       duration: "2h 10min",
     },
     {
+      id: 3,
       title: "Amor à Primeira Vista",
       description:
         "Dois estranhos se encontram por acaso em uma cidade estrangeira e experimentam uma conexão instantânea.",
-      releaseDate: "15 de Setembro de 2023",
+      releaseDate: "15 de Setembro de 2018",
       duration: "1h 55min",
     },
     // Adicione mais filmes aqui

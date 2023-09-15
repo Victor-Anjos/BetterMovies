@@ -1,24 +1,80 @@
-import React, { useState } from "react";
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
-import { Feather } from "@expo/vector-icons";
+import React, { useState, useEffect, useRef } from "react";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Image,
+  StyleSheet,
+  Modal,
+} from "react-native";
+import { Camera } from "expo-camera";
 
 const Profile = () => {
-  const [isEditingEmail, setIsEditingEmail] = useState(false);
-  const [email, setEmail] = useState("victoranjos820@gmail.com");
+  const [hasPermission, setHasPermission] = useState(null);
+  const [photo, setPhoto] = useState(null);
+  const [cameraVisible, setCameraVisible] = useState(false);
+
+  const cameraRef = useRef(null);
+
+  useEffect(() => {
+    (async () => {
+      const { status } = await Camera.requestCameraPermissionsAsync();
+      setHasPermission(status === "granted");
+    })();
+  }, []);
+
+  const handleCapture = async () => {
+    if (cameraRef.current) {
+      const { uri } = await cameraRef.current.takePictureAsync();
+      console.log("Photo taken:", uri);
+      setPhoto(uri);
+      setCameraVisible(false); // Fecha a câmera após tirar a foto
+    }
+  };
 
   return (
     <View style={styles.container}>
       <View style={styles.topBar}>
         <Text style={styles.title}>Perfil</Text>
 
-        <TouchableOpacity style={styles.profileImageContainer}>
-          <View style={styles.iconContainer}>
-            <Feather name="camera" color="white" size={30} />
-          </View>
+        <TouchableOpacity
+          style={styles.profileImageContainer}
+          onPress={() => setCameraVisible(true)}
+        >
+          {photo ? (
+            <Image source={{ uri: photo }} style={styles.profileImage} />
+          ) : (
+            <View style={styles.iconContainer}>
+              <Text style={styles.cameraText}>Tirar Foto</Text>
+            </View>
+          )}
         </TouchableOpacity>
-
-        <Text style={styles.user}>Usuario</Text>
       </View>
+
+      <Modal
+        animationType="slide"
+        transparent={false}
+        visible={cameraVisible}
+        onRequestClose={() => setCameraVisible(false)}
+      >
+        <Camera
+          ref={cameraRef}
+          style={styles.camera}
+          type={Camera.Constants.Type.back}
+          ratio="16:9"
+        >
+          <TouchableOpacity
+            style={styles.captureButton}
+            onPress={() => handleCapture()}
+          >
+            <View style={styles.captureButtonInner}>
+              <View style={styles.captureButtonCircle}>
+                <View style={styles.captureButtonCenter} />
+              </View>
+            </View>
+          </TouchableOpacity>
+        </Camera>
+      </Modal>
     </View>
   );
 };
@@ -40,9 +96,8 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     backgroundColor: "#15214F",
     marginBottom: 15,
-    alignItems: "center", // Centralize os elementos verticalmente.
+    alignItems: "center",
   },
-
   profileImageContainer: {
     width: 120,
     height: 120,
@@ -60,35 +115,57 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  profileImageText: {
+  cameraText: {
     fontSize: 16,
-    color: "#fff",
+    color: "white",
   },
   profileImage: {
     width: 100,
     height: 100,
     borderRadius: 50,
   },
-  user: {
-    fontSize: 20,
-    fontWeight: "bold",
-    marginTop: 10,
-    marginBottom: 30,
-    alignSelf: "center",
-    borderBottomWidth: 1,
-    borderColor: "#FFFFFF",
-    borderStyle: "solid",
-    paddingBottom: 10,
-  },
+
   camera: {
     flex: 1,
+    justifyContent: "flex-end",
+    alignItems: "center",
   },
   captureButton: {
     alignSelf: "center",
-    marginTop: 10,
-    backgroundColor: "#8A2BE2",
-    borderRadius: 5,
-    padding: 10,
+    marginBottom: 20,
+  },
+  captureButtonInner: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: "transparent",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  captureButtonCircle: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: "lightgray",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  captureButtonCenter: {
+    captureButton: {
+      alignSelf: "center",
+      marginBottom: 20,
+      backgroundColor: "fff",
+      borderRadius: 5,
+      padding: 10,
+    },
+    captureButtonText: {
+      color: "#fff",
+      fontWeight: "bold",
+    },
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: "gray",
   },
   captureButtonText: {
     color: "#fff",
