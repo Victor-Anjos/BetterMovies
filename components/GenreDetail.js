@@ -1,5 +1,13 @@
-import React from "react";
-import { View, Text, TextInput, FlatList, StyleSheet } from "react-native";
+import React, { useState, useEffect } from "react";
+import {
+  View,
+  Text,
+  FlatList,
+  StyleSheet,
+  TouchableOpacity,
+  TextInput,
+} from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const GenreDetail = ({ route }) => {
   const { genre } = route.params;
@@ -80,6 +88,49 @@ const GenreDetail = ({ route }) => {
     ];
   }
 
+  const [watchedMovies, setWatchedMovies] = useState([]); // Estado para os filmes assistidos
+
+  // Carregar os filmes assistidos do AsyncStorage quando o componente é montado
+  useEffect(() => {
+    loadWatchedMoviesFromStorage();
+  }, []);
+
+  const loadWatchedMoviesFromStorage = async () => {
+    try {
+      const storedMovies = await AsyncStorage.getItem("watchedMovies");
+      if (storedMovies !== null) {
+        setWatchedMovies(JSON.parse(storedMovies));
+      }
+    } catch (error) {
+      console.error(
+        "Erro ao carregar filmes assistidos do AsyncStorage:",
+        error
+      );
+    }
+  };
+
+  const handleWatchMovie = async (movieTitle) => {
+    const watchedMovie = movies.find((movie) => movie.title === movieTitle);
+    if (watchedMovie) {
+      // Verifique se o filme já está no histórico
+      if (!watchedMovies.some((movie) => movie.title === watchedMovie.title)) {
+        // Adicionar o filme assistido ao histórico
+        const updatedWatchedMovies = [...watchedMovies, watchedMovie];
+        // Atualizar o estado com os filmes assistidos
+        setWatchedMovies(updatedWatchedMovies);
+        try {
+          // Atualizar o AsyncStorage com os filmes assistidos
+          await AsyncStorage.setItem(
+            "watchedMovies",
+            JSON.stringify(updatedWatchedMovies)
+          );
+        } catch (error) {
+          console.error("Erro ao salvar filmes assistidos:", error);
+        }
+      }
+    }
+  };
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>{genre}</Text>
@@ -93,9 +144,16 @@ const GenreDetail = ({ route }) => {
             <Text
               style={styles.movieDetails}
             >{`Data de Lançamento: ${item.releaseDate}`}</Text>
-            <Text
-              style={styles.movieDetails}
-            >{`Duração: ${item.duration}`}</Text>
+            <View style={styles.movieDurationButtonContainer}>
+              <Text
+                style={styles.movieDetails}
+              >{`Duração: ${item.duration}`}</Text>
+              <TouchableOpacity onPress={() => handleWatchMovie(item.title)}>
+                <View style={styles.watchButton}>
+                  <Text style={styles.watchButtonText}>Ver Filme</Text>
+                </View>
+              </TouchableOpacity>
+            </View>
           </View>
         )}
       />
@@ -109,14 +167,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#141839",
     flexDirection: "column",
     paddingBottom: 60,
-  },
-
-  input: {
-    backgroundColor: "white",
-    height: 40,
-    borderColor: "gray",
-    borderWidth: 1,
-    borderRadius: 15,
   },
   title: {
     color: "white",
@@ -148,6 +198,22 @@ const styles = StyleSheet.create({
     color: "#00CED1",
     fontSize: 14,
     marginTop: 8,
+  },
+  movieDurationButtonContainer: {
+    flexDirection: "column",
+    justifyContent: "space-between",
+  },
+  watchButton: {
+    backgroundColor: "#141839",
+    borderRadius: 10,
+    padding: 8,
+    alignItems: "center",
+    marginTop: 8,
+  },
+  watchButtonText: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "bold",
   },
 });
 

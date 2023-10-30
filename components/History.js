@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -7,45 +7,61 @@ import {
   TouchableOpacity,
   TextInput,
 } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const History = () => {
-  const [movies, setMovies] = useState([
-    {
-      id: 1,
-      title: "A Odisseia Espacial",
-      description:
-        "Uma equipe de astronautas é enviada em uma missão para explorar os confins do espaço e descobrir segredos cósmicos.",
-      releaseDate: "10 de Setembro de 2010",
-      duration: "2h 30min",
-    },
-    {
-      id: 2,
-      title: "A Busca Pelo Tesouro Perdido",
-      description:
-        "Um grupo de aventureiros parte em uma jornada épica para encontrar um tesouro lendário escondido em uma ilha remota.",
-      releaseDate: "12 de Setembro de 2013",
-      duration: "2h 10min",
-    },
-    {
-      id: 3,
-      title: "Amor à Primeira Vista",
-      description:
-        "Dois estranhos se encontram por acaso em uma cidade estrangeira e experimentam uma conexão instantânea.",
-      releaseDate: "15 de Setembro de 2018",
-      duration: "1h 55min",
-    },
-    // Adicione mais filmes aqui
-  ]);
-
+const History = ({ navigation }) => {
+  const [watchedMovies, setWatchedMovies] = useState([]);
   const [searchText, setSearchText] = useState("");
-  const [filteredMovies, setFilteredMovies] = useState(movies);
+  const [filteredMovies, setFilteredMovies] = useState([]);
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener("focus", () => {
+      // Quando a tela é focada, carregue os filmes assistidos do AsyncStorage
+      loadWatchedMoviesFromStorage();
+    });
+
+    return unsubscribe;
+  }, [navigation]);
+
+  const loadWatchedMoviesFromStorage = async () => {
+    try {
+      const storedMovies = await AsyncStorage.getItem("watchedMovies");
+      if (storedMovies !== null) {
+        setWatchedMovies(JSON.parse(storedMovies));
+      }
+    } catch (error) {
+      console.error(
+        "Erro ao carregar filmes assistidos do AsyncStorage:",
+        error
+      );
+    }
+  };
 
   const handleSearch = (text) => {
     setSearchText(text);
-    const filtered = movies.filter((movie) =>
+    const filtered = watchedMovies.filter((movie) =>
       movie.title.toLowerCase().includes(text.toLowerCase())
     );
     setFilteredMovies(filtered);
+  };
+
+  const handleRemoveMovieFromHistory = async (movieTitle) => {
+    const updatedWatchedMovies = watchedMovies.filter(
+      (movie) => movie.title !== movieTitle
+    );
+    setWatchedMovies(updatedWatchedMovies);
+
+    try {
+      await AsyncStorage.setItem(
+        "watchedMovies",
+        JSON.stringify(updatedWatchedMovies)
+      );
+    } catch (error) {
+      console.error(
+        "Erro ao atualizar filmes assistidos no AsyncStorage:",
+        error
+      );
+    }
   };
 
   return (
@@ -57,29 +73,37 @@ const History = () => {
         <TextInput
           placeholder="Pesquisar no histórico..."
           style={styles.searchInput}
-          onChangeText={(text) => handleSearch(text)}
+          onChangeText={handleSearch}
           value={searchText}
         />
       </View>
-      {filteredMovies.length === 0 ? (
-        <Text style={styles.noMovies}>
-          Nenhum filme no histórico encontrado
-        </Text>
-      ) : (
-        <FlatList
-          data={filteredMovies}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <View style={styles.movieItem}>
-              <View style={styles.movieDetails}>
-                <Text style={styles.movieTitle}>{item.title}</Text>
-                <Text style={styles.movieRelease}>{item.releaseDate}</Text>
-                <Text style={styles.movieDuration}>{item.duration}</Text>
-              </View>
+      <FlatList
+        data={searchText ? filteredMovies : watchedMovies}
+        keyExtractor={(item) => item.title}
+        ListEmptyComponent={
+          <Text style={styles.noMovies}>
+            Nenhum filme no histórico encontrado
+          </Text>
+        }
+        renderItem={({ item }) => (
+          <View style={styles.movieItem}>
+            <View style={styles.movieDetails}>
+              <Text style={styles.movieTitle}>{item.title}</Text>
+              <Text style={styles.movieRelease}>{item.releaseDate}</Text>
+              <Text style={styles.movieDuration}>{item.duration}</Text>
             </View>
-          )}
-        />
-      )}
+            <TouchableOpacity
+              onPress={() => handleRemoveMovieFromHistory(item.title)}
+            >
+              <View style={styles.removeButton}>
+                <Text style={styles.removeButtonText}>
+                  Remover do Histórico
+                </Text>
+              </View>
+            </TouchableOpacity>
+          </View>
+        )}
+      />
     </View>
   );
 };
@@ -139,13 +163,13 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: "#00CED1",
   },
-  continueButton: {
-    justifyContent: "center",
-    alignItems: "center",
+  removeButton: {
+    backgroundColor: "#FF5733",
+    borderRadius: 5,
+    padding: 8,
   },
-  continueButtonText: {
-    color: "#00CED1",
-    fontWeight: "bold",
+  removeButtonText: {
+    color: "white",
   },
   noMovies: {
     color: "white",
